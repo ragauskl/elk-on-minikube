@@ -1,3 +1,7 @@
+# Requirements 
+
+* [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+
 # Setup
 
 * Create cluster (Windows Hyper-V)
@@ -49,3 +53,10 @@
   ```sh
   kubectl apply -f h-scale.yml
   ```
+
+# Helper Cmds
+
+* Dashboard - `minikube dashboard`
+* Get all - `kubectl -n elasticsearch get all`
+* Describe pod - `kubectl -n elasticsearch describe pods es-master-dc4c46fb-j4fgn`
+* Delete pod - `kubectl -n elasticsearch delete pod es-master-dc4c46fb-j4fgn`
