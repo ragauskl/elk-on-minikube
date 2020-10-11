@@ -1,0 +1,83 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: elasticsearch
+spec:
+  version: 7.9.2
+  nodeSets:
+  - name: master
+    count: 3
+    config:
+      node.master: true
+      node.data: false
+      node.ingest: false
+      node.ml: false
+      xpack.ml.enabled: true
+      node.remote_cluster_client: false
+      # node.store.allow_mmap: false has performance implications and should be tuned for production workloads
+      node.store.allow_mmap: false
+    volumeClaimTemplates:
+      - metadata:
+          # The name of the volume claim must always be elasticsearch-data
+          name: elasticsearch-data
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+          # Choose target StorageClass
+          storageClassName: standard
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms2g -Xmx2g
+          resources:
+            requests:
+              memory: 3Gi
+              cpu: 0.5
+            limits:
+              memory: 3Gi
+              cpu: 2
+  - name: data
+    count: 2
+    config:
+      node.master: false
+      node.data: true
+      node.ingest: true
+      node.ml: true
+      node.remote_cluster_client: false
+    volumeClaimTemplates:
+      - metadata:
+          # The name of the volume claim must always be elasticsearch-data
+          name: elasticsearch-data
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+          # Choose target StorageClass
+          storageClassName: standard
+    podTemplate:
+      spec:
+        initContainers:
+        - name: sysctl
+          securityContext:
+            privileged: true
+          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
+        containers:
+        - name: elasticsearch
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms2g -Xmx2g
+          resources:
+            requests:
+              memory: 3Gi
+              cpu: 0.5
+            limits:
+              memory: 3Gi
+              cpu: 2

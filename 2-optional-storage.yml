@@ -1,0 +1,19 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+# provisioner: kubernetes.io/gce-pd
+provisioner: k8s.io/minikube-hostpath
+# In the PersistentVolume StorageClass, it is important to set volumeBindingMode: WaitForFirstConsumer,
+# otherwise a Pod might be scheduled on a host that cannot access the existing PersistentVolume.
+# This setting isn’t always applied by default on Cloud providers StorageClasses, but in most cases
+# it is possible to create (or patch) StorageClasses to add the setting.
+volumeBindingMode: WaitForFirstConsumer
+# The system cannot reuse a PersistentVolume with existing data from a different cluster. In this case
+# Elasticsearch does not start, as it detects data that belongs to a different cluster. For this reason,
+# it is recommended to use the Delete reclaim policy.
+reclaimPolicy: Delete
+parameters:
+  type: pd-ssd
+  fsType: xfs
+# allowVolumeExpansion: true

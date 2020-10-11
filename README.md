@@ -2,28 +2,37 @@
 
 * [Minikube](https://minikube.sigs.k8s.io/docs/start/)
 
+# Resources
+
+* [Elastic Cloud on Kubernetes](https://www.elastic.co/guide/en/cloud-on-k8s/1.2/k8s-deploy-eck.html)
+* [Orchestrating Elastic Stack applications](https://www.elastic.co/guide/en/cloud-on-k8s/1.2/k8s-orchestrating-elastic-stack-applications.html)
+* [Common Problems](https://www.elastic.co/guide/en/cloud-on-k8s/1.2/k8s-common-problems.html)
+* [Subscriptions](https://www.elastic.co/subscriptions)
+* 
+
 # Setup
 
 * Create cluster (Windows Hyper-V)
   ```sh
   minikube start --driver hyperv --hyperv-virtual-switch "Minikube Virtual Switch" --memory "16g" --cpus 6 --disk-size "100g"
   ```
-* Create 3 master node
+* Install [custom resource definitions](https://download.elastic.co/downloads/eck/1.2.1/all-in-one.yaml) and the operator with its RBAC rules:
   ```sh
-  kubectl apply -f es-master.yml
+  kubectl apply -f 1-custom-resource-def.yml
   ```
-* Create persistent storage and data nodes
+* Optionally create StorageClass
   ```sh
-  kubectl apply -f es-data.yml
+  kubectl apply -f 2-optional-storage.yml
   ```
-* Create client nodes
+* Create Elasticsearch
   ```sh
-  kubectl apply -f es-client.yml
+  kubectl apply -f 3-es.yml
 
+  
   # Test connection
   kubectl run my-shell --rm -i --tty --image ubuntu -- bash
   > apt update && apt install curl -y
-  > curl http://elasticsearch-client.elasticsearch:9200/_cluster/health?pretty
+  > curl http://elasticsearch-es-http.default:9200/_cluster/health?pretty
 
   # Should return:
   {
@@ -44,15 +53,20 @@
     "active_shards_percent_as_number" : 100.0
   }
   ```
-* Expose services to local environment
+* Get 'elastic' user password
+  ```
+  PASSWORD=$(kubectl get secret elasticsearch-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')
+  ```
+* Create Kibana
   ```sh
-  kubectl apply -f ingress.yml
+  kubectl apply -f 4-kibana.yml
+  ```
+* Expose Kibana outside cluster
+  ```sh
+  minikube addons enable ingress
+  kubectl apply -f 5-ingress.yml
   ```
 * Access Kibana @ `http://*minikube ip*/app/kibana` 
-* Optionally apply auto-scaler
-  ```sh
-  kubectl apply -f h-scale.yml
-  ```
 
 # Helper Cmds
 
@@ -60,3 +74,5 @@
 * Get all - `kubectl -n elasticsearch get all`
 * Describe pod - `kubectl -n elasticsearch describe pods es-master-dc4c46fb-j4fgn`
 * Delete pod - `kubectl -n elasticsearch delete pod es-master-dc4c46fb-j4fgn`
+* Get logs - `kubectl -n elasticsearch logs elasticsearch-es-data-0`
+* SSH into pod - `kubectl -n elasticsearch exec --stdin --tty es-master-0 -- /bin/bash`
