@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: elasticsearch
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: es-kibana
+  namespace: elasticsearch
+  labels:
+    component: elasticsearch
+    role: kibana
+spec:
+  selector:
+      matchLabels:
+        component: elasticsearch
+        role: kibana  
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: elasticsearch
+        role: kibana
+    spec:
+      containers:
+      - name: es-kibana
+        image: docker.elastic.co/kibana/kibana-oss:6.2.2
+        env:
+        - name: CLUSTER_NAME
+          value: my-es
+        - name: ELASTICSEARCH_URL
+          value: http://elasticsearch-client.elasticsearch:9200
+        resources:
+          limits:
+            cpu: 0.5
+        ports:
+        - containerPort: 5601
+          name: http
+---
+# Replace LoadBalancer for could provider with Service for local usage
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: kibana
+#   annotations:
+#     cloud.google.com/load-balancer-type: "Internal"
+#   namespace: elasticsearch
+#   labels:
+#     component: elasticsearch
+#     role: kibana
+# spec:
+#   selector:
+#     component: elasticsearch
+#     role: kibana
+#   ports:
+#   - name: http
+#     port: 80
+#     targetPort: 5601
+#     protocol: TCP
+#   type: LoadBalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: elasticsearch
+  labels:
+    component: elasticsearch
+    role: kibana
+spec:
+  ports:
+  - port: 5601
+    name: transport
+    protocol: TCP
+  clusterIP: None
+  selector:
+    component: elasticsearch
+    role: kibana
