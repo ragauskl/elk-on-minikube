@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2020",
+        "lib": ["es2019", "dom"],
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "sourceMap": true,
+        "outDir": "dist",
+        "baseUrl": "src",
+        "strict": false,
+        "removeComments": true
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}
