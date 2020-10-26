@@ -1,3 +1,4 @@
+# docker build -t elk-api:latest .
 FROM mhart/alpine-node:14
 
 ADD ./dist ./dist

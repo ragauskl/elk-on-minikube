@@ -68,6 +68,16 @@
   ```
 * Access Kibana @ `http://*minikube ip*/app/kibana` 
 
+## Run API in Minikube
+
+> /api/...
+
+* Build api to /api/dist with 'tsc' command
+* Run 'minikube docker-env' and follow instructions (Will have to repeat this for every shell that will be used)
+* Build docker image for api 'docker build -t elk-api:latest .'
+* Apply .kube files in order, deployment.yml has to be applied in same shell as last 2 steps
+* Should now be able to access API at **cluster_ip**:30000
+
 # Helper Cmds
 
 * Dashboard - `minikube dashboard`
