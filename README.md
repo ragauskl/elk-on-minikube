@@ -78,11 +78,53 @@
 * Apply .kube files in order, deployment.yml has to be applied in same shell as last 2 steps
 * Should now be able to access API at **cluster_ip**:30000
 
+## Add Beats
+
+* Deploys Metricbeat as a DaemonSet that monitors the host resource usage (CPU, memory, network, filesystem) and Kubernetes resources (Nodes, Pods, Containers, Volumes)
+  ```sh
+  kubectl apply -f 6-metric-beat.yml
+  ```
+* Deploy Filebeat and collect the logs of all containers running in the Kubernetes cluster
+  ```sh
+  kubectl apply -f 7-file-beat.yml
+  ```
+* Deploy Heartbeat to monitor uptime of Elasticsearch and mock API
+   ```sh
+  kubectl apply -f 8-heart-beat.yml
+  ```
+
 # Helper Cmds
 
 * Dashboard - `minikube dashboard`
+* Get 'elastic' default password - `kubectl get secret elasticsearch-es-elastic-user -o go-template='{{.data.elastic | base64decode}}'`
 * Get all - `kubectl -n elasticsearch get all`
 * Describe pod - `kubectl -n elasticsearch describe pods es-master-dc4c46fb-j4fgn`
 * Delete pod - `kubectl -n elasticsearch delete pod es-master-dc4c46fb-j4fgn`
 * Get logs - `kubectl -n elasticsearch logs elasticsearch-es-data-0`
 * SSH into pod - `kubectl -n elasticsearch exec --stdin --tty es-master-0 -- /bin/bash`
+
+# Useful Links
+
+* [Filebeat yml](https://www.elastic.co/guide/en/beats/filebeat/master/configuring-howto-filebeat.html)
+* [Heartbeat yml](https://www.elastic.co/guide/en/beats/heartbeat/current/configuring-howto-heartbeat.html)
+* [Packetbeat yml](https://www.elastic.co/guide/en/beats/packetbeat/current/configuring-howto-packetbeat.html)
+* [Common problems](https://www.elastic.co/guide/en/cloud-on-k8s/1.2/k8s-common-problems.html#k8s-common-problems)
+* [Version Upgrades](https://www.elastic.co/guide/en/elastic-stack/current/upgrading-elastic-stack.html)
+
+## More...
+
+* [Community beats](https://www.elastic.co/guide/en/beats/libbeat/current/community-beats.html)
+  
+## When in prod
+
+* [Setup HTTP Certificate](https://www.elastic.co/guide/en/cloud-on-k8s/1.2/k8s-custom-http-certificate.html) ([other link](https://www.elastic.co/guide/en/cloud-on-k8s/1.2/k8s-tls-certificates.html))
+* 
+
+# To-do
+
+- [ ] Apply API deployment changes and packetbeat
+- [ ] Elasticsearch backup and cleanup
+- [ ] Dashboard for API mem/cpu/scale
+- [ ] [Users management](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api.html#security-user-apis) or [this](https://www.elastic.co/guide/en/cloud-on-k8s/1.2/k8s-users-and-roles.html#k8s_file_realm)
+- [ ] Send logs from outside the cluster
+- [ ] Change load balancing with [Linkerd](https://linkerd.io/)
