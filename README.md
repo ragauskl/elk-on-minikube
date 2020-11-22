@@ -1,6 +1,9 @@
 # Requirements 
 
 * [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+* Administrator privileges when running on Hyper-V (Run VSCode or shell as administrator)
+* jq package if you'll be using ./setup script
+  * Windows: `chocolatey install jq` 
 
 # Resources
 

@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
-        "module": "esnext",
-        "target": "es2020",
-        "lib": ["es2019", "dom"],
+        "module": "commonjs",
+        "target": "es2019",
+        "lib": ["es2019"],
         "noImplicitAny": true,
         "moduleResolution": "node",
         "experimentalDecorators": true,
@@ -11,7 +11,8 @@
         "outDir": "dist",
         "baseUrl": "src",
         "strict": false,
-        "removeComments": true
+        "removeComments": true,
+        "allowJs": true
     },
     "include": [
         "./src/**/*"
