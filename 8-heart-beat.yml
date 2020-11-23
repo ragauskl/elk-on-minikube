@@ -16,7 +16,7 @@ spec:
       hosts: ["elasticsearch-es-http.default.svc:9200"]
     - type: tcp
       schedule: '@every 5s'
-      hosts: ["api.mock-api.svc:3000"]
+      hosts: ["api.elk-api.svc:3000"]
   deployment:
     podTemplate:
       spec:

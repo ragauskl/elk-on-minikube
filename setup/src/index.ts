@@ -15,6 +15,7 @@ const cwd = path.join(__dirname, '../..')
 const shell = new Shell(cwd)
 
 ; (async () => {
+  console.time('Created in')
   await shell.run('minikube delete')
   await shell.run([
     `minikube start`,
@@ -78,6 +79,8 @@ const shell = new Shell(cwd)
     beatType: 'packetbeat',
     yml: '9-packet-beat.yml'
   })
+
+  console.timeEnd('Created in')
 })()
 
 function sleep (ms: number) {
@@ -105,13 +108,21 @@ async function applySet (opts: {
     `--output json | jq -j ".items | length"`
   ]
 
+  let failedWarning: string | undefined
+  console.info(`\n${opts.display} Waiting for ${opts.expectedPods} Pods to be in Running state`)
   do {
-    running = +await shell.run(cmd('Running'))
+    running = +await shell.run(cmd('Running'), { stdoutLog: false })
 
     if (running !== opts.expectedPods) {
-      const failed = +await shell.run(cmd('Failed'))
+      const failed = +await shell.run(cmd('Failed'), { stdoutLog: false })
       if (failed > 0) {
-        console.warn(`\n${opts.display} Pods are failing, please check the logs`)
+        if (!failedWarning) {
+          failedWarning = `\n${opts.display} Pods are failing, please check the logs`
+          console.warn(failedWarning)
+        }
+      } else if (failedWarning) {
+        console.info(`\n${opts.display} Pods no longer failing`)
+        failedWarning = undefined
       }
       await sleep(5000)
     }

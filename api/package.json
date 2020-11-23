@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "tsc && docker build -t elk-api:latest ."
+    "build": "tsc && docker build -t elk-api:v6 .",
+    "apply": "kubectl apply -f ./.kube/1-namespace.yml -f ./.kube/2-deployment.yml -f ./.kube/3-autoscaler.yml -f ./.kube/4-service.yml",
+    "minikube:docker:win": "& minikube -p minikube docker-env | Invoke-Expression"
   },
   "author": "",
   "license": "ISC",
