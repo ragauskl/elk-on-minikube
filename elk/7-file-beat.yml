@@ -18,6 +18,7 @@ spec:
         - add_docker_metadata: {}
         - add_kubernetes_metadata: {}
     - type: docker
+      # /var/lib/docker/containers/*
       containers.ids: "*"
       processors:
         - add_docker_metadata: {}

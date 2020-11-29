@@ -16,6 +16,8 @@ spec:
       node.remote_cluster_client: false
       # node.store.allow_mmap: false has performance implications and should be tuned for production workloads
       node.store.allow_mmap: false
+      path.repo:
+        -"/shared-mount/es-backup"
     volumeClaimTemplates:
       - metadata:
           # The name of the volume claim must always be elasticsearch-data
@@ -42,6 +44,14 @@ spec:
             limits:
               memory: 3Gi
               cpu: 2
+          volumeMounts:
+          - mountPath: /shared-mount
+            name: host-mount
+        volumes:
+        - name: host-mount
+          hostPath:
+            path: /shared-mount
+            type: DirectoryOrCreate
   - name: data
     count: 2
     config:
@@ -50,6 +60,8 @@ spec:
       node.ingest: true
       node.ml: true
       node.remote_cluster_client: false
+      path.repo:
+        -"/shared-mount/es-backup"
     volumeClaimTemplates:
       - metadata:
           # The name of the volume claim must always be elasticsearch-data
@@ -81,3 +93,11 @@ spec:
             limits:
               memory: 3Gi
               cpu: 2
+          volumeMounts:
+          - mountPath: /shared-mount
+            name: host-mount
+        volumes:
+        - name: host-mount
+          hostPath:
+            path: /shared-mount
+            type: DirectoryOrCreate
